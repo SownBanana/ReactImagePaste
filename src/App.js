@@ -22,7 +22,7 @@ function App() {
           var blob = item.getAsFile();
           console.log("====> File: ", blob)
           setFileTmp(blob)
-         
+
         }
       }
     };
@@ -33,7 +33,7 @@ function App() {
 
   useEffect(() => {
     console.log("new file tmp: ", fileTmp, files)
-    if(fileTmp){
+    if (fileTmp) {
       var reader = new FileReader();
       reader.onload = function (event) {
         // console.log(event.target.result); // data url!
@@ -48,7 +48,40 @@ function App() {
     console.log("new files: ", files)
   }, [files])
 
+  const onDragOver = (e) => {
+    // e.stopPropagation();
+    e.preventDefault();
+    // console.log("onDragOver", e)
+  }
 
+  const onDragEnter = (e) => {
+    // e.stopPropagation();
+    e.preventDefault();
+    console.log("onDragEnter", e)
+
+  }
+
+  const onFileDrop = (e) => {
+    // e.stopPropagation();
+    e.preventDefault();
+
+    console.log("onFileDrop", e);
+
+    
+    let file = "";
+    if (e.dataTransfer.items) {
+      // Use DataTransferItemList interface to access the file(s)
+      file =
+        [...e.dataTransfer.items]
+          .find((item) => item.kind === "file")
+          .getAsFile() ;
+    } else {
+      // Use DataTransfer interface to access the file(s)
+      file = e.dataTransfer.files[0];
+    }
+    setFileTmp(file)
+    // alert("dropped")
+  }
 
   return (
     <div className="App">
@@ -57,7 +90,12 @@ function App() {
         <p>
           Edit <code>src/App.js</code> and save to reload.
         </p>
-        <textarea ref={textArea} id="message" />
+        <textarea
+          // onDragEnter={onDragEnter}
+          onDragOver={onDragOver}
+          onDrop={onFileDrop}
+          ref={textArea} id="message"
+        />
 
         <a
           className="App-link"
