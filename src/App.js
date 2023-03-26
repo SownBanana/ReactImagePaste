@@ -6,26 +6,16 @@ function App() {
   const [files, setFiles] = useState([])
   const [fileTmp, setFileTmp] = useState()
   const [isOver, setIsOver] = useState(false)
-
+  const [isOutside, setIsOutside] = useState(false)
 
   const textArea = useRef(null)
 
-  useEffect(() => {
-    console.log("new file tmp: ", fileTmp, files)
-    if (fileTmp) {
-      var reader = new FileReader();
-      reader.onload = function (event) {
-        // console.log(event.target.result); // data url!
-        fileTmp.src = event.target.result
-        setFiles([...files, fileTmp])
-      };
-      reader.readAsDataURL(fileTmp);
-    }
-  }, [fileTmp])
-
-  useEffect(() => {
-    console.log("new files: ", files)
-  }, [files])
+  const onDragStart = (e) => {
+    // e.stopPropagation();
+    e.preventDefault();
+    // setIsOver(true);
+    console.log("onDragStart", e)
+  }
 
   const onDragOver = (e) => {
     // e.stopPropagation();
@@ -44,6 +34,8 @@ function App() {
   const onDragEnter = (e) => {
     // e.stopPropagation();
     e.preventDefault();
+    setIsOver(true);
+
     console.log("onDragEnter", e)
 
   }
@@ -54,6 +46,7 @@ function App() {
 
     console.log("onFileDrop", e);
 
+    setIsOver(false);
 
     let file = "";
     if (e.dataTransfer.items) {
@@ -86,6 +79,46 @@ function App() {
     }
   }
 
+
+  useEffect(() => {
+    console.log("new file tmp: ", fileTmp, files)
+    if (fileTmp) {
+      var reader = new FileReader();
+      reader.onload = function (event) {
+        // console.log(event.target.result); // data url!
+        fileTmp.src = event.target.result
+        setFiles([...files, fileTmp])
+      };
+      reader.readAsDataURL(fileTmp);
+    }
+  }, [fileTmp])
+
+  useEffect(() => {
+    console.log("new files: ", files)
+  }, [files])
+
+  useEffect(() => {
+    document.addEventListener("dragover", function (e) {
+      console.log("drag over", e, e.target)
+      setIsOutside(true)
+    });
+
+    document.addEventListener("dragleave", function (e) {
+      console.log("drag leave", e, e.target)
+      setIsOutside(false)
+
+    });
+    document.addEventListener("drop", function (e) {
+      console.log("drop", e, e.target)
+      setIsOutside(false)
+    });
+
+    // return () => {
+    //   second
+    // }
+  }, [])
+
+
   return (
     <div className="App">
       <header className="App-header">
@@ -95,15 +128,16 @@ function App() {
         </p>
         <textarea
           style={{
-            border: isOver ? "2px solid lightblue" : "none"
+            border: isOver ? "2px solid red" : isOutside ? "2px solid green" : "none"
           }}
-          // onDragEnter={onDragEnter}
-          onDragOver={onDragOver}
+          onDragEnter={onDragEnter}
+          // onDragOver={onDragOver}
           onDragLeave={onDragLeave}
           onDrop={onFileDrop}
           onPaste={onPaste}
-
-          ref={textArea} id="message"
+          onDragStart={onDragStart}
+          ref={textArea}
+          id="message"
         />
 
         <a
