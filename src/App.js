@@ -5,31 +5,10 @@ import { useEffect, useRef, useState } from 'react';
 function App() {
   const [files, setFiles] = useState([])
   const [fileTmp, setFileTmp] = useState()
+  const [isOver, setIsOver] = useState(false)
+
 
   const textArea = useRef(null)
-  // console.log("===> print this shit")
-  useEffect(() => {
-    // console.log("set paste event: ", textArea)
-    textArea.current.onpaste = function (event) {
-      // console.log("paste event: ", event);
-      var items = (event.clipboardData || event.originalEvent.clipboardData).items;
-      console.log(JSON.stringify(items)); // might give you mime types
-      for (var index in items) {
-        var item = items[index];
-        // console.log("====> item: ", item)
-        if (item.kind === 'file') {
-
-          var blob = item.getAsFile();
-          console.log("====> File: ", blob)
-          setFileTmp(blob)
-
-        }
-      }
-    };
-    return () => {
-      textArea.current.onpaste = null;
-    }
-  }, [])
 
   useEffect(() => {
     console.log("new file tmp: ", fileTmp, files)
@@ -51,7 +30,15 @@ function App() {
   const onDragOver = (e) => {
     // e.stopPropagation();
     e.preventDefault();
+    setIsOver(true);
     // console.log("onDragOver", e)
+  }
+
+  const onDragLeave = (e) => {
+    // e.stopPropagation();
+    e.preventDefault();
+    // console.log("onDragOver", e)
+    setIsOver(false);
   }
 
   const onDragEnter = (e) => {
@@ -67,20 +54,36 @@ function App() {
 
     console.log("onFileDrop", e);
 
-    
+
     let file = "";
     if (e.dataTransfer.items) {
       // Use DataTransferItemList interface to access the file(s)
       file =
         [...e.dataTransfer.items]
           .find((item) => item.kind === "file")
-          .getAsFile() ;
+          .getAsFile();
     } else {
       // Use DataTransfer interface to access the file(s)
       file = e.dataTransfer.files[0];
     }
     setFileTmp(file)
     // alert("dropped")
+  }
+
+  const onPaste = (e) => {
+    // console.log("paste event: ", event);
+    var items = (e.clipboardData || e.originalEvent.clipboardData).items;
+    // console.log(JSON.stringify(items)); // might give you mime types
+    for (var index in items) {
+      var item = items[index];
+      // console.log("====> item: ", item)
+      if (item.kind === 'file') {
+
+        var blob = item.getAsFile();
+        console.log("====> File: ", blob)
+        setFileTmp(blob)
+      }
+    }
   }
 
   return (
@@ -91,9 +94,15 @@ function App() {
           Edit <code>src/App.js</code> and save to reload.
         </p>
         <textarea
+          style={{
+            border: isOver ? "2px solid lightblue" : "none"
+          }}
           // onDragEnter={onDragEnter}
           onDragOver={onDragOver}
+          onDragLeave={onDragLeave}
           onDrop={onFileDrop}
+          onPaste={onPaste}
+
           ref={textArea} id="message"
         />
 
