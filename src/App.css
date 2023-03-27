@@ -13,6 +13,25 @@
   }
 }
 
+.loading {
+  animation: App-logo-spin infinite 3s linear;
+}
+
+.loading-svg path {
+  animation: Loading-animate infinite 2s linear;
+  transform-origin: center;
+}
+
+@keyframes Loading-animate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -32,6 +51,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
